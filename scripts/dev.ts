@@ -50,6 +50,16 @@ export function parseDbDelay(argv: string[]): number {
   return DEFAULT_DEV_DB_DELAY;
 }
 
+export function describeDevFlags(noteCount: number, dbDelay: number): string {
+  const notes =
+    noteCount > 0
+      ? `seed ${noteCount} note${noteCount === 1 ? "" : "s"}`
+      : "no notes seeded";
+  const delay = dbDelay > 0 ? `${dbDelay}ms query delay` : "no query delay";
+
+  return `[dev] flags: --notes=${noteCount} (${notes}), --db-delay=${dbDelay} (${delay})`;
+}
+
 export function devUserDataDir(
   appData: string | undefined,
   home: string,
@@ -211,6 +221,8 @@ if (isDirectRun) {
 
     const noteCount = parseNoteCount(process.argv.slice(2));
     const dbDelay = parseDbDelay(process.argv.slice(2));
+
+    console.log(describeDevFlags(noteCount, dbDelay));
 
     console.log("[dev] vite is up, launching electron");
     start("electron", "bunx", ["electron", "."], {

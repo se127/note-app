@@ -5,6 +5,7 @@ import {
   createServerProbe,
   DEFAULT_DEV_DB_DELAY,
   DEFAULT_DEV_NOTE_COUNT,
+  describeDevFlags,
   devUserDataDir,
   isRunning,
   parseDbDelay,
@@ -94,6 +95,30 @@ describe("viteArgs", () => {
     expect(
       viteArgs("127.0.0.1", 5173).filter((arg) => arg === "--port"),
     ).toHaveLength(1);
+  });
+});
+
+describe("describeDevFlags", () => {
+  test("names both values as they were passed", () => {
+    const line = describeDevFlags(5000, 1000);
+
+    expect(line).toContain("--notes=5000");
+    expect(line).toContain("--db-delay=1000");
+    expect(line).toContain("seed 5000 notes");
+    expect(line).toContain("1000ms query delay");
+  });
+
+  test("spells out what a zero turns off", () => {
+    const line = describeDevFlags(0, 0);
+
+    expect(line).toContain("--notes=0");
+    expect(line).toContain("no notes seeded");
+    expect(line).toContain("--db-delay=0");
+    expect(line).toContain("no query delay");
+  });
+
+  test("keeps a single seeded note singular", () => {
+    expect(describeDevFlags(1, 0)).toContain("seed 1 note)");
   });
 });
 
